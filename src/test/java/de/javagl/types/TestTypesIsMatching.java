@@ -22,7 +22,7 @@ public class TestTypesIsMatching
     /**
      * Whether debug information should be printed
      */
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = false;
     
     /**
      * Tests whether the given types are matching type arguments

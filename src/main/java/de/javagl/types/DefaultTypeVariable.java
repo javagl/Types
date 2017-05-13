@@ -125,8 +125,9 @@ final class DefaultTypeVariable<D extends GenericDeclaration>
     @Override
     public String toString()
     {
-        // XXX Appending debug information of the generic declaration here:
-        return name+" [GD:"+System.identityHashCode(genericDeclaration)+"]";
+        // Appending debug information of the generic declaration:
+        //return name+" [GD:"+System.identityHashCode(genericDeclaration)+"]";
+        return name;
     }
 
     @Override
