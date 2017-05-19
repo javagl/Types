@@ -132,7 +132,7 @@ public class TestTypeParser
     
     /**
      * Test for the on-demand import string handling
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException If a class is not found
      */
     @Test
     public void testOnDemandImportStringHandling() throws ClassNotFoundException
@@ -146,7 +146,7 @@ public class TestTypeParser
     
     /**
      * Test for the named import string handling
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException If a class is not found
      */
     @Test
     public void testNamedImportStringHandling() throws ClassNotFoundException
@@ -165,7 +165,7 @@ public class TestTypeParser
     
     /**
      * Test for import string priorities
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException If a class is not found
      */
     @Test
     public void testImportStringPriorities() throws ClassNotFoundException
@@ -188,7 +188,7 @@ public class TestTypeParser
     
     /**
      * Test for the import string validity tests
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException If a class is not found
      */
     @Test
     public void testImportStringHandling() throws ClassNotFoundException
@@ -208,7 +208,7 @@ public class TestTypeParser
     
     /**
      * Test for the import string ambiguity check
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException If a class is not found
      */
     @Test
     public void testImportStringAmbiguity() throws ClassNotFoundException
@@ -230,7 +230,7 @@ public class TestTypeParser
     
     /**
      * Test whether redundant import strings work
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException If a class is not found
      */
     @Test
     public void testImportRedundancy() throws ClassNotFoundException
