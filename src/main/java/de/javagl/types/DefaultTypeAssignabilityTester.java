@@ -43,11 +43,20 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
     private final TypeVariableMapping typeVariableMapping;
 
     /**
+     * Flag indicating whether this class should assume that type variables
+     * that are about to be assigned <i>from</i> and that are not bound 
+     * explicitly (via the {@link #typeVariableMapping}) may be assigned  
+     * to any value (even if such an assignment would require the 
+     * type variable to be more specific) 
+     */
+    private final boolean assumeFromTypeVariableArgumentIsFree;
+    
+    /**
      * Create a new instance
      */
     DefaultTypeAssignabilityTester()
     {
-        this(TypeVariableMappings.create());
+        this(TypeVariableMappings.create(), false);
     }
 
     /**
@@ -55,9 +64,27 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
      * 
      * @param typeVariableMapping The {@link TypeVariableMapping}
      */
-    DefaultTypeAssignabilityTester(TypeVariableMapping typeVariableMapping)
+    DefaultTypeAssignabilityTester(
+        TypeVariableMapping typeVariableMapping)
+    {
+        this(typeVariableMapping, false);
+    }
+    
+    /**
+     * Create a new instance using the given {@link TypeVariableMapping}
+     * 
+     * @param typeVariableMapping The {@link TypeVariableMapping}
+     * @param assumeFromTypeVariableArgumentIsFree Whether type variables to
+     * assign to should be assumed to be free - for details, 
+     * see {@link #assumeFromTypeVariableArgumentIsFree}
+     */
+    DefaultTypeAssignabilityTester(
+        TypeVariableMapping typeVariableMapping,
+        boolean assumeFromTypeVariableArgumentIsFree)
     {
         this.typeVariableMapping = typeVariableMapping;
+        this.assumeFromTypeVariableArgumentIsFree = 
+            assumeFromTypeVariableArgumentIsFree;
     }
     
     @Override
@@ -338,7 +365,6 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
             TypeVariable<?> toTypeVariableArgument = 
                 (TypeVariable<?>)toTypeArgument;
             
-            //System.out.println("Test for match "+toTypeVariableArgument);
             Type typeForTypeVariableArgument = 
                 typeVariableMapping.get(toTypeVariableArgument);
             if (typeForTypeVariableArgument == null)
@@ -350,28 +376,27 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
                 return isMatchingTypeArgument(
                     typeForTypeVariableArgument, fromTypeArgument);
             }
-            
-//            if (toTypeVariableArgument.equals(fromTypeArgument))
-//            {
-//                return true;
-//            }
-//            if (fromTypeArgument instanceof WildcardType)
-//            {
-//                return false;
-//            }
-//            return false;
         }
         if (fromTypeArgument instanceof TypeVariable<?>)
         {
             TypeVariable<?> fromTypeVariableArgument = 
                 (TypeVariable<?>)fromTypeArgument;
+            Type fromMappedType = 
+                typeVariableMapping.get(fromTypeVariableArgument);
+            if (fromMappedType == null &&
+                assumeFromTypeVariableArgumentIsFree)
+            {
+                return true;
+            }
+            
             if (toTypeArgument.equals(fromTypeVariableArgument))
             {
                 return true;
             }
             if (toTypeArgument instanceof WildcardType)
             {
-                WildcardType toWildcardTypeArgument = (WildcardType)toTypeArgument;
+                WildcardType toWildcardTypeArgument = 
+                    (WildcardType)toTypeArgument;
                 return isMatchingFromTypeVariableToWildcardTypeArgument(
                     toWildcardTypeArgument, fromTypeVariableArgument);
             }

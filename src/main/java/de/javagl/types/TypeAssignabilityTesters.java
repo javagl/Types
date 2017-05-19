@@ -43,6 +43,19 @@ public class TypeAssignabilityTesters
     }
 
     /**
+     * Create a new {@link TypeAssignabilityTester} that assumes that 
+     * type variables may be assigned any value (so they are assumed
+     * to be unbound).
+     * 
+     * @return The {@link TypeAssignabilityTester}
+     */
+    public static TypeAssignabilityTester createForFreeTypeVariables()
+    {
+        return new DefaultTypeAssignabilityTester(
+            TypeVariableMappings.create(), true);
+    }
+    
+    /**
      * Create a new, default {@link TypeAssignabilityTester}
      * 
      * @param typeVariableMapping The {@link TypeVariableMapping}
