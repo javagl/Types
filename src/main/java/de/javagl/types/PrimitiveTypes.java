@@ -247,14 +247,14 @@ public class PrimitiveTypes
      * http://docs.oracle.com/javase/specs/jls/se8/html/jls-4.html#jls-4.10.1
      * </a>
      * <pre><code>
-     * double >1 float
-     * float >1 long
-     * long >1 int
-     * int >1 char
-     * int >1 short
-     * short >1 byte
+     * double &gt;1 float
+     * float &gt;1 long
+     * long &gt;1 int
+     * int &gt;1 char
+     * int &gt;1 short
+     * short &gt;1 byte
      * </code></pre>
-     * where ">1" means "is direct supertype of". <br>
+     * where <code>&gt;1</code> means "is direct supertype of". <br>
      * <br>
      * Note that <code>double</code> and <code>boolean</code> do not have
      * a direct primitive supertype!<br>

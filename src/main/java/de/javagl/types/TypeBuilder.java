@@ -37,7 +37,7 @@ import java.lang.reflect.Type;
  * <pre><code>
  * // Build the type "List&lt;? extends String&gt;" :
  * Type type = Types.create(List.class).withSubtypeOf(String.class).build()
- * </pre></code>
+ * </code></pre>
  */
 public interface TypeBuilder
 {
