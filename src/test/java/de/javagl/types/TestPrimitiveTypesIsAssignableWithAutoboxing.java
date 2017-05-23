@@ -83,7 +83,7 @@ public class TestPrimitiveTypesIsAssignableWithAutoboxing
     
     /**
      * Test the basic assignabilities for primitive and boxed types,
-     * invloving 'char'
+     * involving 'char'
      */
     @Test
     public void testIsPrimitiveAssignableWithAutoboxing_ForChar()

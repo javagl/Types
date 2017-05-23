@@ -572,22 +572,6 @@ public class TestTypesIsAssignable
     }
     
     
-    /**
-     * Test cases like 
-     * List<T> = List<Integer>
-     */
-    @Test
-    public void testParameterized_ToTypeVariable_FromClass()
-    {
-        Type toComponent0 = Types.createTypeVariable("T", Object.class);
-        Type to = Types.createParameterizedType(List.class, null, toComponent0);
-        
-        Type fromComponent0 = Integer.class;
-        Type from = Types.createParameterizedType(List.class, null, fromComponent0);
-
-        assertTrue (testIsAssignable(to, from));
-    }
-    
     
     //=========================================================================
     // Test the remaining assignments to parameterized types
@@ -687,11 +671,12 @@ public class TestTypesIsAssignable
         Type from1 = Number.class;
         Type from2 = Integer.class;
 
-        // By default, a type variable is assignable by anything
-        // (there is no predefined mapping)
-        assertTrue (testIsAssignable(to, from0));
-        assertTrue (testIsAssignable(to, from1));
-        assertTrue (testIsAssignable(to, from2));
+        // By default, a type variable is not assignable by anything
+        // (as long as there is no predefined mapping, and the type
+        // variables are not assumed to be free)
+        assertFalse(testIsAssignable(to, from0));
+        assertFalse(testIsAssignable(to, from1));
+        assertFalse(testIsAssignable(to, from2));
         assertTrue (testIsAssignable(to, to));
     }
 
@@ -713,11 +698,12 @@ public class TestTypesIsAssignable
         Type from1 = Types.createParameterizedType(List.class, null, fromArgument1);
         Type from2 = Types.createParameterizedType(ArrayList.class, null, fromArgument2);
 
-        // By default, a type variable is assignable by anything
-        // (there is no predefined mapping)
-        assertTrue (testIsAssignable(to, from0));
-        assertTrue (testIsAssignable(to, from1));
-        assertTrue (testIsAssignable(to, from2));
+        // By default, a type variable is not assignable by anything
+        // (as long as there is no predefined mapping, and the type
+        // variables are not assumed to be free)
+        assertFalse(testIsAssignable(to, from0));
+        assertFalse(testIsAssignable(to, from1));
+        assertFalse(testIsAssignable(to, from2));
         assertTrue (testIsAssignable(to, to));
     }
 
@@ -735,11 +721,12 @@ public class TestTypesIsAssignable
         Type from1 = Types.createWildcardType(new Type[]{Number.class}, null);
         Type from2 = Types.createWildcardType(new Type[]{Integer.class}, null);
 
-        // By default, a type variable is assignable by anything
-        // (there is no predefined mapping)
-        assertTrue (testIsAssignable(to, from0));
-        assertTrue (testIsAssignable(to, from1));
-        assertTrue (testIsAssignable(to, from2));
+        // By default, a type variable is not assignable by anything
+        // (as long as there is no predefined mapping, and the type
+        // variables are not assumed to be free)
+        assertFalse(testIsAssignable(to, from0));
+        assertFalse(testIsAssignable(to, from1));
+        assertFalse(testIsAssignable(to, from2));
         assertTrue (testIsAssignable(to, to));
     }
     
@@ -756,11 +743,12 @@ public class TestTypesIsAssignable
         Type from1 = Types.createWildcardType(null, new Type[]{Number.class});
         Type from2 = Types.createWildcardType(null, new Type[]{Integer.class});
 
-        // By default, a type variable is assignable by anything
-        // (there is no predefined mapping)
-        assertTrue (testIsAssignable(to, from0));
-        assertTrue (testIsAssignable(to, from1));
-        assertTrue (testIsAssignable(to, from2));
+        // By default, a type variable is not assignable by anything
+        // (as long as there is no predefined mapping, and the type
+        // variables are not assumed to be free)
+        assertFalse(testIsAssignable(to, from0));
+        assertFalse(testIsAssignable(to, from1));
+        assertFalse(testIsAssignable(to, from2));
         assertTrue (testIsAssignable(to, to));
     }
 
@@ -778,11 +766,12 @@ public class TestTypesIsAssignable
         Type from1 = Types.createTypeVariable("U", new Type[]{Number.class});
         Type from2 = Types.createTypeVariable("U", new Type[]{Integer.class});
 
-        // By default, a type variable is assignable by anything
-        // (there is no predefined mapping)
-        assertTrue (testIsAssignable(to, from0));
-        assertTrue (testIsAssignable(to, from1));
-        assertTrue (testIsAssignable(to, from2));
+        // By default, a type variable is not assignable by anything
+        // (as long as there is no predefined mapping, and the type
+        // variables are not assumed to be free)
+        assertFalse(testIsAssignable(to, from0));
+        assertFalse(testIsAssignable(to, from1));
+        assertFalse(testIsAssignable(to, from2));
         assertTrue (testIsAssignable(to, to));
     }
 
@@ -811,17 +800,18 @@ public class TestTypesIsAssignable
         Type from1 = arrayOfListWithNumber;
         Type from2 = arrayOfArrayListWithInteger;
 
-        // By default, a type variable is assignable by anything
-        // (there is no predefined mapping)
-        assertTrue (testIsAssignable(to0, from0));
-        assertTrue (testIsAssignable(to1, from0));
-        assertTrue (testIsAssignable(to2, from0));
-        assertTrue (testIsAssignable(to0, from1));
-        assertTrue (testIsAssignable(to1, from1));
-        assertTrue (testIsAssignable(to2, from1));
-        assertTrue (testIsAssignable(to0, from2));
-        assertTrue (testIsAssignable(to1, from2));
-        assertTrue (testIsAssignable(to2, from2));
+        // By default, a type variable is not assignable by anything
+        // (as long as there is no predefined mapping, and the type
+        // variables are not assumed to be free)
+        assertFalse(testIsAssignable(to0, from0));
+        assertFalse(testIsAssignable(to1, from0));
+        assertFalse(testIsAssignable(to2, from0));
+        assertFalse(testIsAssignable(to0, from1));
+        assertFalse(testIsAssignable(to1, from1));
+        assertFalse(testIsAssignable(to2, from1));
+        assertFalse(testIsAssignable(to0, from2));
+        assertFalse(testIsAssignable(to1, from2));
+        assertFalse(testIsAssignable(to2, from2));
     }
 
     

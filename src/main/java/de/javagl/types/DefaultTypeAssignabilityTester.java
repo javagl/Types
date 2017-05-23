@@ -44,12 +44,11 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
 
     /**
      * Flag indicating whether this class should assume that type variables
-     * that are about to be assigned <i>from</i> and that are not bound 
-     * explicitly (via the {@link #typeVariableMapping}) may be assigned  
-     * to any value (even if such an assignment would require the 
-     * type variable to be more specific) 
+     * that are not bound explicitly (via the {@link #typeVariableMapping}) 
+     * may be assigned to and from any value (even if such an assignment 
+     * would require the type variable to be more specific) 
      */
-    private final boolean assumeFromTypeVariableArgumentIsFree;
+    private final boolean assumeFreeTypeVariables;
     
     /**
      * Create a new instance
@@ -74,17 +73,16 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
      * Create a new instance using the given {@link TypeVariableMapping}
      * 
      * @param typeVariableMapping The {@link TypeVariableMapping}
-     * @param assumeFromTypeVariableArgumentIsFree Whether type variables to
+     * @param assumeFreeTypeVariables Whether type variables to
      * assign to should be assumed to be free - for details, 
-     * see {@link #assumeFromTypeVariableArgumentIsFree}
+     * see {@link #assumeFreeTypeVariables}
      */
     DefaultTypeAssignabilityTester(
         TypeVariableMapping typeVariableMapping,
-        boolean assumeFromTypeVariableArgumentIsFree)
+        boolean assumeFreeTypeVariables)
     {
         this.typeVariableMapping = typeVariableMapping;
-        this.assumeFromTypeVariableArgumentIsFree = 
-            assumeFromTypeVariableArgumentIsFree;
+        this.assumeFreeTypeVariables = assumeFreeTypeVariables;
     }
     
     @Override
@@ -182,6 +180,12 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
         else if (from instanceof TypeVariable<?>)
         {
             TypeVariable<?> fromTypeVariable = (TypeVariable<?>)from;
+            
+            if (isUnbound(fromTypeVariable))
+            {
+                return assumeFreeTypeVariables;
+            }
+            
             Type upperBounds[] = fromTypeVariable.getBounds();
             return anyAssignable(toClass, upperBounds);
         }
@@ -252,6 +256,12 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
         else if (from instanceof TypeVariable<?>)
         {
             TypeVariable<?> fromTypeVariable = (TypeVariable<?>)from;
+            
+            if (isUnbound(fromTypeVariable))
+            {
+                return assumeFreeTypeVariables;
+            }
+            
             Type upperBounds[] = fromTypeVariable.getBounds();
             return anyAssignable(toParameterizedType, upperBounds);
         }
@@ -369,7 +379,7 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
                 typeVariableMapping.get(toTypeVariableArgument);
             if (typeForTypeVariableArgument == null)
             {
-                return true;
+                return assumeFreeTypeVariables;
             }
             else
             {
@@ -381,12 +391,10 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
         {
             TypeVariable<?> fromTypeVariableArgument = 
                 (TypeVariable<?>)fromTypeArgument;
-            Type fromMappedType = 
-                typeVariableMapping.get(fromTypeVariableArgument);
-            if (fromMappedType == null &&
-                assumeFromTypeVariableArgumentIsFree)
+            
+            if (isUnbound(fromTypeVariableArgument))
             {
-                return true;
+                return assumeFreeTypeVariables;
             }
             
             if (toTypeArgument.equals(fromTypeVariableArgument))
@@ -529,6 +537,12 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
         else if (from instanceof TypeVariable<?>)
         {
             TypeVariable<?> fromTypeVariable = (TypeVariable<?>)from;
+            
+            if (isUnbound(fromTypeVariable))
+            {
+                return assumeFreeTypeVariables;
+            }
+            
             Type[] fromUpperBounds = fromTypeVariable.getBounds();
             return anyAssignable(toUpperBound, fromUpperBounds);
         }
@@ -573,6 +587,12 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
         else if (from instanceof TypeVariable<?>)
         {
             TypeVariable<?> fromTypeVariable = (TypeVariable<?>)from;
+            
+            if (isUnbound(fromTypeVariable))
+            {
+                return assumeFreeTypeVariables;
+            }
+            
             Type[] fromUpperBounds = fromTypeVariable.getBounds();
             return anyAssignable(fromUpperBounds, toLowerBound);
         }
@@ -601,15 +621,14 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
         
         if (toMappedType == null)
         {
-            return true;
+            return assumeFreeTypeVariables;
         }
         if (from instanceof TypeVariable<?>)
         {
             TypeVariable<?> fromTypeVariable = (TypeVariable<?>)from;
-            Type fromMappedType = typeVariableMapping.get(fromTypeVariable);
-            if (fromMappedType == null)
+            if (isUnbound(fromTypeVariable))
             {
-                return true;
+                return assumeFreeTypeVariables;
             }
         }
         return isAssignable(toMappedType, from);
@@ -644,6 +663,12 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
         else if (from instanceof TypeVariable<?>)
         {
             TypeVariable<?> fromTypeVariable = (TypeVariable<?>)from;
+            
+            if (isUnbound(fromTypeVariable))
+            {
+                return assumeFreeTypeVariables;
+            }
+            
             Type[] fromUpperBounds = fromTypeVariable.getBounds();
             return anyAssignable(toGenericArrayType, fromUpperBounds);
         }
@@ -659,6 +684,30 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
         throw new IllegalArgumentException("Unknown from-type: "+from);
     }
 
+    /**
+     * Returns whether the given type variable is unbound. This means that
+     * it is not mapped to a specific type via the {@link #typeVariableMapping},
+     * and that it does not have any upper bounds (except for 
+     * <code>Object.class</code>)
+     *  
+     * @param typeVariable The type variable
+     * @return Whether the type variable is unbound
+     */
+    private boolean isUnbound(TypeVariable<?> typeVariable)
+    {
+        Type typeForTypeVariable = 
+            typeVariableMapping.get(typeVariable);
+        if (typeForTypeVariable == null)
+        {
+            Type[] upperBounds = typeVariable.getBounds();
+            if (upperBounds.length == 1 && upperBounds[0].equals(Object.class))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Returns whether all of the given 'to' types are assignable
      * from the given 'from' type. 
