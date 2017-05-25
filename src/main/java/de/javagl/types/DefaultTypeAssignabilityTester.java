@@ -51,11 +51,19 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
     private final boolean assumeFreeTypeVariables;
     
     /**
+     * Flag indicating whether the type bounds of type variables should
+     * be ignored. If this is <code>true</code>, the type
+     * <code>T extends Number</code> will be assignable
+     * from <code>String</code>.
+     */
+    private final boolean ignoreTypeVariableBounds;
+    
+    /**
      * Create a new instance
      */
     DefaultTypeAssignabilityTester()
     {
-        this(TypeVariableMappings.create(), false);
+        this(TypeVariableMappings.create(), false, false);
     }
 
     /**
@@ -66,7 +74,7 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
     DefaultTypeAssignabilityTester(
         TypeVariableMapping typeVariableMapping)
     {
-        this(typeVariableMapping, false);
+        this(typeVariableMapping, false, false);
     }
     
     /**
@@ -76,13 +84,17 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
      * @param assumeFreeTypeVariables Whether type variables to
      * assign to should be assumed to be free - for details, 
      * see {@link #assumeFreeTypeVariables}
+     * @param ignoreTypeVariableBounds Whether type variable bounds
+     * should be ignored
      */
     DefaultTypeAssignabilityTester(
         TypeVariableMapping typeVariableMapping,
-        boolean assumeFreeTypeVariables)
+        boolean assumeFreeTypeVariables,
+        boolean ignoreTypeVariableBounds)
     {
         this.typeVariableMapping = typeVariableMapping;
         this.assumeFreeTypeVariables = assumeFreeTypeVariables;
+        this.ignoreTypeVariableBounds = ignoreTypeVariableBounds;
     }
     
     @Override
@@ -379,7 +391,16 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
                 typeVariableMapping.get(toTypeVariableArgument);
             if (typeForTypeVariableArgument == null)
             {
-                return assumeFreeTypeVariables;
+                if (!assumeFreeTypeVariables)
+                {
+                    return false;
+                }
+                if (ignoreTypeVariableBounds)
+                {
+                    return true;
+                }
+                Type[] toUpperBounds = toTypeVariableArgument.getBounds();
+                return allAssignable(toUpperBounds, fromTypeArgument);
             }
             else
             {
@@ -687,8 +708,9 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
     /**
      * Returns whether the given type variable is unbound. This means that
      * it is not mapped to a specific type via the {@link #typeVariableMapping},
-     * and that it does not have any upper bounds (except for 
-     * <code>Object.class</code>)
+     * and that it either does not have any upper bounds (except for 
+     * <code>Object.class</code>), or {@link #ignoreTypeVariableBounds} is
+     * <code>true</code>.
      *  
      * @param typeVariable The type variable
      * @return Whether the type variable is unbound
@@ -699,6 +721,10 @@ class DefaultTypeAssignabilityTester implements TypeAssignabilityTester
             typeVariableMapping.get(typeVariable);
         if (typeForTypeVariable == null)
         {
+            if (ignoreTypeVariableBounds)
+            {
+                return true;
+            }
             Type[] upperBounds = typeVariable.getBounds();
             if (upperBounds.length == 1 && upperBounds[0].equals(Object.class))
             {

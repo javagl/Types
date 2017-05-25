@@ -44,15 +44,28 @@ public class TypeAssignabilityTesters
 
     /**
      * Create a new {@link TypeAssignabilityTester} that assumes that 
-     * type variables may be assigned any value (so they are assumed
-     * to be unbound).
+     * type variables may be assigned any value if they are not 
+     * explicitly bound.
      * 
      * @return The {@link TypeAssignabilityTester}
      */
     public static TypeAssignabilityTester createForFreeTypeVariables()
     {
         return new DefaultTypeAssignabilityTester(
-            TypeVariableMappings.create(), true);
+            TypeVariableMappings.create(), true, false);
+    }
+    
+    /**
+     * Create a new {@link TypeAssignabilityTester} that assumes that 
+     * type variables may be assigned any value (so they are assumed
+     * to be unbound), and that their bounds are ignored.
+     * 
+     * @return The {@link TypeAssignabilityTester}
+     */
+    public static TypeAssignabilityTester createForFreeUnboundedTypeVariables()
+    {
+        return new DefaultTypeAssignabilityTester(
+            TypeVariableMappings.create(), true, true);
     }
     
     /**

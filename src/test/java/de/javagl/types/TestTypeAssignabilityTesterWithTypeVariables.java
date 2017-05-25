@@ -58,6 +58,26 @@ public class TestTypeAssignabilityTesterWithTypeVariables
     }
     
     /**
+     * Tests whether the given types are assignable with free type variables,
+     * ignoring the bounds
+     * 
+     * @param to The type to assign to
+     * @param from The type to assign from
+     * @return Whether the types are assignable
+     */
+    private static boolean testIsAssignableFreeUnbound(Type to, Type from)
+    {
+        if (DEBUG)
+        {
+            return printAssignable(to, from, 
+                "with free type variables, ignoring the bounds");
+        }
+        TypeAssignabilityTester t = 
+            TypeAssignabilityTesters.createForFreeUnboundedTypeVariables();
+        return t.isAssignable(to, from);
+    }
+    
+    /**
      * Print the given types and the result of their assignability test
      * 
      * @param to The type to assign to
@@ -90,9 +110,32 @@ public class TestTypeAssignabilityTesterWithTypeVariables
         Type fromComponent0 = Integer.class;
         Type from = Types.createParameterizedType(List.class, null, fromComponent0);
 
-        assertFalse(testIsAssignableBound(to, from));
-        assertTrue (testIsAssignableFree (to, from));
+        assertFalse(testIsAssignableBound      (to, from));
+        assertTrue (testIsAssignableFree       (to, from));
+        assertTrue (testIsAssignableFreeUnbound(to, from));
     }
+    
+    /**
+     * Test cases like 
+     * List<T extends Number> = List<String>
+     * 
+     * This is only assignable when assuming free type variables and
+     * ignoring the bounds 
+     */
+    @Test
+    public void testParameterized_ToBoundedTypeVariable_FromClass()
+    {
+        Type toComponent0 = Types.createTypeVariable("T", Number.class);
+        Type to = Types.createParameterizedType(List.class, null, toComponent0);
+        
+        Type fromComponent0 = String.class;
+        Type from = Types.createParameterizedType(List.class, null, fromComponent0);
+
+        assertFalse(testIsAssignableBound      (to, from));
+        assertFalse(testIsAssignableFree       (to, from));
+        assertTrue (testIsAssignableFreeUnbound(to, from));
+    }
+    
     
     /**
      * Test cases like 
@@ -109,8 +152,9 @@ public class TestTypeAssignabilityTesterWithTypeVariables
         Type fromComponent0 = Types.createTypeVariable("T");
         Type from = Types.createParameterizedType(List.class, null, fromComponent0);
         
-        assertFalse(testIsAssignableBound(to, from));
-        assertTrue (testIsAssignableFree (to, from));
+        assertFalse(testIsAssignableBound      (to, from));
+        assertTrue (testIsAssignableFree       (to, from));
+        assertTrue (testIsAssignableFreeUnbound(to, from));
     }
     
     /**
@@ -125,8 +169,43 @@ public class TestTypeAssignabilityTesterWithTypeVariables
         Type to = Types.createTypeVariable("T");
         Type from = Integer.class;
 
-        assertFalse(testIsAssignableBound(to, from));
-        assertTrue (testIsAssignableFree (to, from));
+        assertFalse(testIsAssignableBound      (to, from));
+        assertTrue (testIsAssignableFree       (to, from));
+        assertTrue (testIsAssignableFreeUnbound(to, from));
+    }
+    
+    /**
+     * Test cases like 
+     * T extends Number = Integer
+     * 
+     * This is only assignable when assuming free type variables
+     */
+    @Test
+    public void test_ToBoundedTypeVariable_FromClass()
+    {
+        Type to = Types.createTypeVariable("T", Number.class);
+        Type from = String.class;
+
+        assertFalse(testIsAssignableBound      (to, from));
+        assertTrue (testIsAssignableFree       (to, from));
+        assertTrue (testIsAssignableFreeUnbound(to, from));
+    }
+    
+    /**
+     * Test cases like 
+     * Number = T extends Integer
+     * 
+     * This is always possible 
+     */
+    @Test
+    public void test_ToClass_FromBoundedTypeVariable_WithSubtype()
+    {
+        Type to = Integer.class;
+        Type from = Types.createTypeVariable("T", Integer.class);
+
+        assertTrue (testIsAssignableBound      (to, from));
+        assertTrue (testIsAssignableFree       (to, from));
+        assertTrue (testIsAssignableFreeUnbound(to, from));
     }
     
     /**
@@ -141,9 +220,31 @@ public class TestTypeAssignabilityTesterWithTypeVariables
         Type to = Integer.class;
         Type from = Types.createTypeVariable("T");
 
-        assertFalse(testIsAssignableBound(to, from));
-        assertTrue (testIsAssignableFree (to, from));
+        assertFalse(testIsAssignableBound      (to, from));
+        assertTrue (testIsAssignableFree       (to, from));
+        assertTrue (testIsAssignableFreeUnbound(to, from));
     }
+    
+    /**
+     * Test cases like 
+     * String = T extends Number
+     * 
+     * This is only assignable when assuming free type variables and
+     * ignoring the bounds
+     */
+    @Test
+    public void test_ToClass_FromBoundedTypeVariable_WithUnrelatedType()
+    {
+        Type to = String.class;
+        Type from = Types.createTypeVariable("T", Number.class);
+
+        assertFalse(testIsAssignableBound      (to, from));
+        assertFalse(testIsAssignableFree       (to, from));
+        assertTrue (testIsAssignableFreeUnbound(to, from));
+    }
+    
+    
+    
     
     
 }
