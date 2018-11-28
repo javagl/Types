@@ -10,7 +10,7 @@
 
     <groupId>de.javagl</groupId>
     <artifactId>types</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <name>types</name>
     <description>Methods and classes for handling types in Java</description>
